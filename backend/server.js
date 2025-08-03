@@ -6,8 +6,23 @@ dotenv.config();
 
 const app = express();
 
-app.get("/products", (req, res) => {})
-//console.log (process.env.MONGO_URL)
+app.post("/products", async (req, res) => {
+    const product = req.body; // User will send this data
+
+    if(!product.name || product.price || product.image) {
+        return res.status(400).json({success:false, message: "please provide all fields"});
+    }
+
+    const newproduct = new product(product)
+
+    try {
+        await newproduct.save();
+        res.status(201).json({ success: true, data: newproduct});
+    } catch (error) {
+        console.error("Error in Create product:", error.message);
+        res.status(500).json({success: false, message: "server Error"});
+    }
+});
 
 app.listen(5000, () => {
     connectDB();
