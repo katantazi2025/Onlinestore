@@ -2,6 +2,10 @@ import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import mongoose from "mongoose";
+import Product from "./models/product.model.js";
+
+
+
 
 dotenv.config();
 
@@ -11,7 +15,7 @@ app.use(express.json()) // allows to accept json data in the req.body
 
 app.get("/api/products", async (req, res) =>{
     try {
-        const products = await product.find({});
+        const products = await Product.find({});
         res.status(200).json({ success: true, data: products});
     } catch (error) {
         res.status(500).json({ success: false, message: "Server Error"})
@@ -20,22 +24,22 @@ app.get("/api/products", async (req, res) =>{
 })
 
 app.post("/api/products", async (req, res) => {
-    const product = req.body; // User will send this data
+  const { name, price, image } = req.body;
 
-    if(!product.name || product.price || product.image) {
-        return res.status(400).json({success:false, message: "please provide all fields"});
-    }
+  if (!name || !price || !image) {
+    return res.status(400).json({ success: false, message: "please provide all fields" });
+  }
 
-    const newproduct = new product(product)
-
-    try {
-        await newproduct.save();
-        res.status(201).json({ success: true, data: newproduct});
-    } catch (error) {
-        console.error("Error in Create product:", error.message);
-        res.status(500).json({success: false, message: "server Error"});
-    }
+  try {
+    const newProduct = new Product({ name, price, image });  // ✅ This must use 'Product'
+    await newProduct.save();
+    res.status(201).json({ success: true, data: newProduct });
+  } catch (error) {
+    console.error("Error in Create product:", error.message);
+    res.status(500).json({ success: false, message: "server Error" });
+  }
 });
+
 
 app.put("/api/products/:id", async (req, res) => {
     const{ id } = req.params;
