@@ -1,5 +1,8 @@
 import express from "express";
-import { createproduct, deleteproduct, getproducts, updatedProduct } from "../backend/controller/product.controller.js";
+
+import { createProduct, deleteproduct, getproducts, updatedProduct } from "../controller/product.controller.js";
+
+
 
 
 const router = express.Router();
@@ -16,7 +19,7 @@ router.get("/", getproducts);
  * @desc    Create a new product
  * @access  Public
  */
-router.post("/", createproduct);
+router.post("/", createProduct);
 
 /**
  * @route   PUT /api/products/:id

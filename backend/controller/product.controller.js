@@ -1,3 +1,4 @@
+import mongoose  from "mongoose";
 import Product from "../models/product.model.js";
 
 export const getproducts = async (req, res) => {
@@ -10,15 +11,16 @@ export const getproducts = async (req, res) => {
     }
 }
 
-export const createproduct = async (req, res) =>  {
-  const { name, price, image } = req.body;
+export const createProduct = async (req, res) =>  {
+  ///const product = req.body;
 
-  if (!name || !price || !image) {
+  if (!product.name || !product.price || !product.image) {
     return res.status(400).json({ success: false, message: "Please provide all fields" });
   }
 
+  const newProduct = new Product(product);
+
   try {
-    const newProduct = new Product({ name, price, image });
     await newProduct.save();
     res.status(201).json({ success: true, data: newProduct });
   } catch (error) {
@@ -30,33 +32,22 @@ export const createproduct = async (req, res) =>  {
 
 export const  updatedProduct = async (req, res) =>  {
   const { id } = req.params;
-  const { name, price, image } = req.body;
+  const product = req.body;
 
-  if (!name || !price || !image) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ success: false, message: "Please provide all fields" });
   }
 
-  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({ success: false, message: "Invalid product ID" });
-  }
-
   try {
-    const updatedProduct = await Product.findByIdAndUpdate(
-      id,
-      { name, price, image },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedProduct) {
-      return res.status(404).json({ success: false, message: "Product not found" });
-    }
-
-    res.status(200).json({ success: true, data: updatedProduct });
-  } catch (error) {
+    const updatedProduct = await Product.findByIdAndUpdate(id, product, {new: true});
+    res.status(200).json({success: true, data: updatedProduct });
+    } catch (error) {
     console.error("Error updating product:", error.message);
     res.status(500).json({ success: false, message: "Server Error" });
-  }
-};
+
+  } 
+  };
+
 
 
 export const deleteproduct =  async (req, res) => {
